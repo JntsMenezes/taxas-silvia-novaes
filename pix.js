@@ -39,17 +39,21 @@ function brCode({ chave, nome, cidade, valor }) {
   return p + crc16(p);
 }
 
-// mensagem revisada (nem-parece-ia, 22/10/2026) para mandar à cliente pelo WhatsApp
+// texto definido pela loja (imagem do WhatsApp de 22/10/2026), igual ao que ela manda à cliente
 function mensagemCobranca(conta, valor) {
   return [
-    'Olá! Aqui é da Sílvia Novaes Joias & Acessórios.',
-    `O valor da sua compra ficou em ${brl(valor)}.`,
+    'Olá! Aqui é da Sílvia Novaes Acessórios. ✨',
     '',
-    'Pix copia e cola (cole no app do seu banco, o valor já vem preenchido):',
+    `O valor da sua compra ficou em ${brl(valor)}. 🛍️`,
+    '',
+    'Segue chave Pix cópia e cola:',
     brCode({ ...conta, valor }),
     '',
     `Se preferir digitar, a chave Pix é ${conta.mostrar || conta.chave}, em nome de ${conta.nome}.`,
-    'Quando pagar, me manda o comprovante por aqui? Obrigada!',
+    '',
+    'Ao efetuar o pagamento por gentileza encaminhe o comprovante 🥰',
+    '',
+    'Desde já, obrigada ✨',
   ].join('\n');
 }
 
