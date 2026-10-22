@@ -13,7 +13,7 @@ const nuvem = (() => {
     return null;
   }
   const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
-  const st = { sessao: null, loja: null, canal: null, timerConfig: null, timerVendas: null, enviandoConfig: false };
+  const st = { sessao: null, loja: null, canal: null, timerConfig: null, timerVendas: null, ultimoEnviado: null, base: null, recuperando: false, redesenharDepois: false };
   const CACHE = 'taxas.nuvem.v1';
 
   // ---------- conversão entre o banco e o formato do app ----------
@@ -78,6 +78,8 @@ const nuvem = (() => {
     const { error } = await sb.auth.updateUser({ password: $('novaSenha').value });
     if (error) { $('senhaErro').textContent = msg(error); return; }
     toast('Senha trocada');
+    st.recuperando = false;
+    history.replaceState(null, '', location.pathname);
     abrirLoja();
   });
   $('portaLoja').addEventListener('submit', async (e) => {
@@ -111,7 +113,9 @@ const nuvem = (() => {
     }
   }
 
+  const configAtual = () => ({ taxas: db.taxas, taxasBand: db.taxasBand, bandExtra: db.bandExtra, ver: db.ver });
   function aplicarConfig(conf) {
+    st.base = conf?.taxas ? structuredClone(conf) : null;
     db.taxas = conf?.taxas || structuredClone(TAXAS_OFICIAIS);
     db.taxasBand = conf?.taxasBand || {};
     db.bandExtra = conf?.bandExtra || [];
@@ -120,6 +124,7 @@ const nuvem = (() => {
   }
 
   async function abrirLoja() {
+    if (st.recuperando) { porta('portaSenha'); return; } // veio do link de "Esqueci a senha"
     const c = lerCache();
     if (c?.loja) { st.loja = c.loja; db = c.db; registrarExtras(); entrar(); }
     const { data: membros, error } = await sb.from('membros').select('loja_id').eq('user_id', st.sessao.user.id).limit(1);
@@ -157,7 +162,8 @@ const nuvem = (() => {
     st.canal = sb.channel('loja-' + st.loja.id)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vendas', filter: `loja_id=eq.${st.loja.id}` }, () => recarregarVendas())
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'lojas', filter: `id=eq.${st.loja.id}` }, (p) => {
-        if (st.enviandoConfig || st.timerConfig) return; // a mudança é nossa
+        if (JSON.stringify(p.new.config) === st.ultimoEnviado) return; // é o eco do que este computador acabou de salvar
+        if (st.timerConfig) { st.base = structuredClone(p.new.config); return; } // temos mudança a enviar: a junção cuida
         aplicarConfig(p.new.config); gravarCache(); redesenhar();
       })
       .subscribe();
@@ -169,10 +175,47 @@ const nuvem = (() => {
       try { db.vendas = (await todasVendas(st.loja.id)).map(paraApp); gravarCache(); redesenhar(); } catch (e) { /* tenta na próxima mudança */ }
     }, 700);
   }
+  // mudança feita em outro computador: atualiza só os números, sem voltar ao topo
   function redesenhar() {
-    if (document.querySelector('tr.editando') || (typeof tour !== 'undefined' && tour.k)) return; // não atrapalha quem está editando
+    if (typeof tour !== 'undefined' && tour.k) return;
     const aberta = document.querySelector('.view.on')?.id.replace('v-', '');
-    if (aberta && aberta !== 'lancar') abrir(aberta); else if (aberta === 'lancar') renderRecentes();
+    const foco = document.activeElement;
+    const digitando = foco && foco.matches('input, select') && document.getElementById('v-' + aberta)?.contains(foco);
+    if (aberta === 'inicio') renderResumo();
+    else if (aberta === 'lancar') { renderRecentes(); if (!digitando) sugerirTaxa(); }
+    else if (aberta === 'simular') renderRank();
+    else if (aberta === 'vendas') { if (!document.querySelector('tr.editando')) renderLista(); else st.redesenharDepois = true; }
+    else if (aberta === 'taxas') { if (digitando) st.redesenharDepois = true; else renderTaxas(); }
+  }
+  // quem estava digitando recebe a atualização assim que sai do campo
+  document.addEventListener('focusout', () => setTimeout(() => {
+    if (!st.redesenharDepois || !st.loja) return;
+    const foco = document.activeElement;
+    if (foco && foco.matches('input, select') && foco.closest('#tabTaxas, tr.editando')) return;
+    if (document.querySelector('tr.editando')) return;
+    st.redesenharDepois = false; redesenhar();
+  }, 50));
+
+  // junta as mudanças: o que este computador mudou desde a última versão do banco vai por cima da versão atual
+  const ehObj = (o) => o && typeof o === 'object' && !Array.isArray(o);
+  function diferencas(base, atual, caminho = [], out = []) {
+    if (!ehObj(base) || !ehObj(atual)) { if (JSON.stringify(base) !== JSON.stringify(atual)) out.push({ caminho, valor: atual }); return out; }
+    for (const k of new Set([...Object.keys(base), ...Object.keys(atual)])) {
+      if (!(k in atual)) out.push({ caminho: [...caminho, k], apagar: true });
+      else if (!(k in base)) out.push({ caminho: [...caminho, k], valor: atual[k] });
+      else diferencas(base[k], atual[k], [...caminho, k], out);
+    }
+    return out;
+  }
+  function aplicarDiferencas(obj, difs) {
+    for (const d of difs) {
+      if (!d.caminho.length) { obj = structuredClone(d.valor); continue; }
+      let o = obj;
+      for (const k of d.caminho.slice(0, -1)) o = ehObj(o[k]) ? o[k] : (o[k] = {});
+      const ult = d.caminho[d.caminho.length - 1];
+      if (d.apagar) delete o[ult]; else o[ult] = structuredClone(d.valor);
+    }
+    return obj;
   }
 
   // ---------- gravar ----------
@@ -181,11 +224,21 @@ const nuvem = (() => {
     st.timerConfig = setTimeout(async () => {
       st.timerConfig = null;
       if (!st.loja) return;
-      st.enviandoConfig = true;
-      const config = { taxas: db.taxas, taxasBand: db.taxasBand, bandExtra: db.bandExtra, ver: db.ver };
+      let config = configAtual();
+      // pega a versão do banco e aplica por cima só o que mudou aqui
+      const atual = await sb.from('lojas').select('config').eq('id', st.loja.id).single();
+      if (!atual.error && atual.data?.config?.taxas && st.base) {
+        config = aplicarDiferencas(structuredClone(atual.data.config), diferencas(st.base, configAtual()));
+      }
+      st.ultimoEnviado = JSON.stringify(config);
       const { error } = await sb.from('lojas').update({ config }).eq('id', st.loja.id);
-      setTimeout(() => { st.enviandoConfig = false; }, 1500);
-      if (error) toast('As taxas não foram salvas na nuvem: ' + msg(error));
+      if (error) { toast('As taxas não foram salvas na nuvem: ' + msg(error)); return; }
+      // a tela passa a mostrar a versão juntada (inclui o que outra pessoa mudou)
+      // se já há outra mudança esperando, não pisa nela: só atualiza a base
+      if (st.timerConfig) { st.base = structuredClone(config); return; }
+      const mudouDeFora = JSON.stringify(config) !== JSON.stringify(configAtual());
+      aplicarConfig(config); gravarCache();
+      if (mudouDeFora) redesenhar();
     }, 500);
   }
 
@@ -203,8 +256,11 @@ const nuvem = (() => {
   }
 
   async function iniciar() {
+    const hash = new URLSearchParams(location.hash.slice(1));
+    st.recuperando = hash.get('type') === 'recovery';
+    const erroLink = hash.get('error_code') || hash.get('error');
     sb.auth.onAuthStateChange((evento, sessao) => {
-      if (evento === 'PASSWORD_RECOVERY') { st.sessao = sessao; porta('portaSenha'); return; }
+      if (evento === 'PASSWORD_RECOVERY') { st.recuperando = true; st.sessao = sessao; porta('portaSenha'); return; }
       const antes = st.sessao?.user?.id;
       st.sessao = sessao;
       if (evento === 'SIGNED_OUT') { sairLimpo(); return; }
@@ -212,6 +268,16 @@ const nuvem = (() => {
     });
     const { data } = await sb.auth.getSession();
     st.sessao = data.session;
+    if (erroLink) {
+      history.replaceState(null, '', location.pathname);
+      if (!st.sessao) {
+        porta('portaLogin');
+        $('loginErro').textContent = /expired/i.test(erroLink + hash.get('error_description'))
+          ? 'Esse link venceu ou já foi usado. Peça outro em "Esqueci a senha".'
+          : 'O link não funcionou: ' + (hash.get('error_description') || erroLink);
+        return;
+      }
+    }
     if (!st.sessao) { porta('portaLogin'); return; }
     abrirLoja();
   }
