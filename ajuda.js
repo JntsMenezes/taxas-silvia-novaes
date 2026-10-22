@@ -29,7 +29,7 @@ const TOURS = {
     passos: [
       { tela: 'lancar', alvo: '#fData', texto: 'Na tela Lançar venda (F2), a data já vem com o dia de hoje. Troque se a venda for de outro dia.' },
       { tela: 'lancar', alvo: '#fValor', texto: 'Digite o valor da venda. Embaixo aparece como o programa entendeu, para conferir.', digita: '350,00' },
-      { tela: 'lancar', alvo: '#fMaquina', texto: 'Escolha a máquina em que a venda passou.' },
+      { tela: 'lancar', alvo: '#fMaquina', texto: 'Escolha a máquina em que a venda passou. Pix cobrado pela chave da loja (pelo WhatsApp, por exemplo) é "Pix da loja".' },
       { tela: 'lancar', alvo: '#fParcela', texto: 'Escolha a parcela. Só aparecem as parcelas que a máquina aceita.' },
       { tela: 'lancar', alvo: '#fBand', texto: 'Escolha a bandeira do cartão. O programa lembra a última que você usou.' },
       { tela: 'lancar', alvo: '#fTaxa', texto: 'A taxa em R$ vem calculada pela tabela. Se a máquina cobrou outro valor, corrija aqui.' },

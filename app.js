@@ -17,7 +17,7 @@ function num(s) {
   return parseFloat(t) || 0;
 }
 const chipBand = (k) => k === 'TODAS' ? 'Todas as bandeiras' : `${logo(k)}${BAND[k].nome}`;
-const NOMES = { INFINITEPAY: 'InfinitePay', LARANJINHA: 'Laranjinha', 'MERCADO PAGO': 'Mercado Pago', PRIME: 'Prime', 'PRIME LINK': 'Prime Link', LINK: 'Link', TOM: 'TOM' };
+const NOMES = { 'PIX DA LOJA': 'Pix da loja', INFINITEPAY: 'InfinitePay', LARANJINHA: 'Laranjinha', 'MERCADO PAGO': 'Mercado Pago', PRIME: 'Prime', 'PRIME LINK': 'Prime Link', LINK: 'Link', TOM: 'TOM' };
 const nm = (m) => NOMES[m] || String(m).toLowerCase().replace(/(^|\s)\p{L}/gu, (c) => c.toUpperCase());
 const ordemParcela = (p) => { const i = PARCELAS.indexOf(p); return i < 0 ? 99 : i; };
 const nomeMes = (ym) => { const [y, m] = ym.split('-'); return MESES[+m - 1] + '/' + y.slice(2); };
@@ -29,6 +29,8 @@ const TAXAS_VER = 2;
 const TAXAS_OFICIAIS = {
   'MERCADO PAGO': { '1x': 3.10, '2x': 4.70, '3x': 5.55, '4x': 6.40, '5x': 7.25, '6x': 8.10, '10x': 11.50 },
   'INFINITEPAY': { 'PIX': 0, 'Débito': 1.37, '1x': 3.15, '2x': 5.39, '3x': 6.12, '4x': 6.85, '5x': 7.57, '6x': 8.28, '10x': 11.06 },
+  // Pix cobrado pela chave do banco da loja (ex.: pelo WhatsApp), sem maquininha
+  'PIX DA LOJA': { 'PIX': 0 },
   'LARANJINHA': { 'Débito': 0.80, '1x': 3.36, '2x': 4.46, '3x': 5.20, '4x': 5.94, '5x': 6.68, '6x': 7.42, '10x': 10.70 },
 };
 
@@ -61,10 +63,17 @@ function carregar() {
 // 22/10/2026: o PIX da InfinitePay entra como 0% uma única vez (a planilha mostra Pix sem taxa).
 // Se alguém apagar depois, não volta. Devolve true quando mudou algo.
 function migrarPix(d) {
-  if (d.pix0) return false;
-  d.pix0 = true;
-  if (d.taxas?.INFINITEPAY && d.taxas.INFINITEPAY.PIX == null) d.taxas.INFINITEPAY.PIX = 0;
-  return true;
+  let mudou = false;
+  if (!d.pix0) {
+    d.pix0 = true; mudou = true;
+    if (d.taxas?.INFINITEPAY && d.taxas.INFINITEPAY.PIX == null) d.taxas.INFINITEPAY.PIX = 0;
+  }
+  // 22/10/2026: "Pix da loja" (chave do banco da loja) entra uma vez; se excluírem, não volta
+  if (!d.pixLoja) {
+    d.pixLoja = true; mudou = true;
+    if (d.taxas && !d.taxas['PIX DA LOJA']) d.taxas['PIX DA LOJA'] = { PIX: 0 };
+  }
+  return mudou;
 }
 
 // taxas e bandeiras: no aparelho ou na configuração da loja (site)
@@ -425,6 +434,7 @@ function renderParcelasForm() {
   const ps = parcelasDe(form.m);
   form.p ??= ps.includes('1x') ? '1x' : ps[0];
   chips($('fParcela'), ps, form.p, (p) => { form.p = p; $('fBandBox').hidden = semBandeira(p); sugerirTaxa(); });
+  $('fBandBox').hidden = semBandeira(form.p);
   // sem taxa de Pix cadastrada a opção some; explica como liberar
   const semPix = form.m && db.taxas[form.m] && db.taxas[form.m].PIX == null;
   $('fPixHint').textContent = semPix ? `Pix não aparece porque a taxa do PIX da ${nm(form.m)} está em branco em Taxas (F5). Se ela não cobra no Pix, preencha 0.` : '';

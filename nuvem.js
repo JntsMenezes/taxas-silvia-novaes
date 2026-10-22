@@ -113,7 +113,7 @@ const nuvem = (() => {
     }
   }
 
-  const configAtual = () => ({ taxas: db.taxas, taxasBand: db.taxasBand, bandExtra: db.bandExtra, ver: db.ver, pix0: db.pix0 });
+  const configAtual = () => ({ taxas: db.taxas, taxasBand: db.taxasBand, bandExtra: db.bandExtra, ver: db.ver, pix0: db.pix0, pixLoja: db.pixLoja });
   function aplicarConfig(conf) {
     st.base = conf?.taxas ? structuredClone(conf) : null;
     db.taxas = conf?.taxas || structuredClone(TAXAS_OFICIAIS);
@@ -121,6 +121,7 @@ const nuvem = (() => {
     db.bandExtra = conf?.bandExtra || [];
     db.ver = conf?.ver || TAXAS_VER;
     db.pix0 = !!conf?.pix0;
+    db.pixLoja = !!conf?.pixLoja;
     registrarExtras();
   }
 
