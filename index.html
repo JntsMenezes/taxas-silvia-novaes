@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'none'">
+<title>Taxas · Sílvia Novaes</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="tema.js"></script>
+<style>
+:root{
+  --bg:#F5EEE4; --card:#FFFCF7; --sand:#E4CFB6; --sand-soft:#EFE2D1;
+  --ink:#4A3826; --muted:#735C43; --line:#E6D8C5;
+  --gold:#7E5D27; --gold-deep:#6E4E1C; --gold-soft:#F1E5D0;
+  --bad:#A0402F; --bad-soft:#F5E1DA; --good:#55753A;
+  --field:#9C8467; --accent:#6E4E1C; --accent-hover:#5C4015; --on-accent:#FFF8EE; --row-hover:#FBF5EC;
+  --s-col:#B8873A; --s-lin:#A3401F; --grid:#EFE6D9;
+  --r:12px; color-scheme:light;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Jost","Segoe UI",system-ui,sans-serif;
+}
+/* tema escuro: café e dourado da mesma paleta */
+:root[data-theme="dark"]{
+  --bg:#1C1511; --card:#261D17; --sand:#3A2D22; --sand-soft:#211913;
+  --ink:#F2E7D7; --muted:#BFA98C; --line:#3A2E24;
+  --gold:#D2AE72; --gold-deep:#E3C48C; --gold-soft:#3A2C1C;
+  --bad:#E58A78; --bad-soft:#4A241D; --good:#A7C487;
+  --field:#7F6A51; --accent:#D2AE72; --accent-hover:#E3C48C; --on-accent:#241A10; --row-hover:#2E241C;
+  --s-col:#A57A22; --s-lin:#D2576E; --grid:#33281F;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1C1511; --card:#261D17; --sand:#3A2D22; --sand-soft:#211913;
+    --ink:#F2E7D7; --muted:#BFA98C; --line:#3A2E24;
+    --gold:#D2AE72; --gold-deep:#E3C48C; --gold-soft:#3A2C1C;
+    --bad:#E58A78; --bad-soft:#4A241D; --good:#A7C487;
+    --field:#7F6A51; --accent:#D2AE72; --accent-hover:#E3C48C; --on-accent:#241A10; --row-hover:#2E241C;
+    --s-col:#A57A22; --s-lin:#D2576E; --grid:#33281F;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+::selection{background:var(--gold-soft);color:var(--ink)}
+input,select{caret-color:var(--gold-deep)}
+*{scrollbar-width:thin;scrollbar-color:var(--field) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--field);border-radius:10px;border:3px solid var(--bg)}
+::-webkit-scrollbar-track{background:transparent}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+input:focus-visible,select:focus-visible{outline:none}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans);font-weight:400}
+body{display:flex;overflow:hidden}
+
+/* ---------- barra lateral ---------- */
+aside{width:236px;flex:none;background:var(--sand-soft);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:28px 0 20px;position:sticky;top:0;height:100vh}
+.marca{text-align:center;padding:0 18px 26px;border-bottom:1px solid var(--line);margin:0 18px 18px}
+.marca .nome{font:400 31px/1 "Great Vibes",cursive;color:var(--gold-deep);white-space:nowrap}
+.marca .sub{font-size:11.5px;letter-spacing:.2em;white-space:nowrap;color:var(--muted);margin-top:8px;text-transform:uppercase}
+nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+nav button{display:flex;align-items:center;gap:12px;border:0;background:none;font:inherit;font-size:15px;color:var(--muted);padding:11px 14px;border-radius:10px;text-align:left;cursor:pointer;transition:background .15s,color .15s}
+nav button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+nav button:hover{background:var(--gold-soft);color:var(--ink)}
+nav button.on{background:var(--card);color:var(--gold-deep);font-weight:500;box-shadow:0 1px 0 var(--line)}
+nav kbd{margin-left:auto;font:12px var(--sans);color:var(--muted)}
+.tema{margin:auto 18px 16px;display:flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
+.tema button{flex:1;border:0;background:none;font:inherit;font-size:12.5px;color:var(--muted);padding:6px 0;border-radius:7px;cursor:pointer}
+.tema button[aria-pressed="true"]{background:var(--card);color:var(--gold-deep);font-weight:500;box-shadow:0 1px 0 var(--line)}
+.rodape{padding:0 30px;font-size:12px;color:var(--muted)}
+
+/* ---------- conteúdo ---------- */
+main{flex:1;min-width:0;padding:28px 40px 48px;overflow:auto;height:100vh}
+.wrap{max-width:1120px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+h1{font:600 34px/1.1 var(--serif);margin:0;color:var(--ink)}
+h2{font:600 21px var(--serif);margin:0 0 12px;color:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.grid-form{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:20px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px}
+select,input{font:inherit;font-size:15px;color:var(--ink);background:var(--card);border:1px solid var(--field);border-radius:9px;padding:10px 12px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s}
+select:focus,input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+select.mes{width:auto;min-width:130px;cursor:pointer}
+label{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:16px 0 7px}
+label:first-child{margin-top:0}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.kpi small{display:block;color:var(--muted);font-size:13.5px}
+.kpi b{display:block;font:500 28px/1.2 var(--sans);margin-top:4px;color:var(--ink);font-variant-numeric:proportional-nums;letter-spacing:-.01em}
+.kpi em{font-style:normal;font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:4px}
+.kpi em svg{width:12px;height:12px;fill:currentColor}
+.up{color:var(--bad)!important}.down{color:var(--good)!important}
+.frase{margin:0 0 22px;color:var(--ink);font-size:15.5px;max-width:72ch}
+.frase p{margin:0 0 3px}
+.nota{color:var(--muted);font-size:13.5px;margin:-4px 0 12px}
+.nota p{margin:0}
+
+.row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0;padding-top:0}
+.row:last-child{padding-bottom:0}
+.row .n{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.row small{color:var(--muted)}
+.bar{height:5px;border-radius:3px;background:var(--sand-soft);margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);border-radius:3px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--field);background:var(--card);border-radius:999px;padding:7px 15px;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.chip:hover{border-color:var(--gold)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:500}
+.btn{display:block;width:100%;border:0;border-radius:10px;padding:13px;font:inherit;font-weight:500;font-size:15px;letter-spacing:.01em;background:var(--accent);color:var(--on-accent);margin-top:20px;cursor:pointer;transition:background .15s,transform .1s}
+.btn:hover{background:var(--accent-hover)}
+.btn:active,.chip:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--gold-deep);border:1px solid var(--gold);width:auto;padding:9px 18px;margin:0}
+.btn.ghost:hover{background:var(--gold-soft)}
+.hint{font-size:13px;color:var(--muted);margin-top:7px}
+.rank .best b{color:var(--good)}
+.tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--gold-soft);color:var(--gold-deep);font-weight:500;margin-left:6px}
+.del{border:1px solid transparent;background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer}
+.del:hover{color:var(--bad);border-color:var(--bad-soft);background:var(--bad-soft)}
+.del[data-ok]{color:var(--card);background:var(--bad)}
+
+table{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numeric:tabular-nums}
+th,td{padding:9px 5px;border-top:1px solid var(--line);text-align:center}
+th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;border-top:0;padding-top:0}
+td.l,th.l{text-align:left}
+tr:hover td{background:var(--row-hover)}
+td input{width:56px;padding:6px;text-align:center;font-size:14px}
+.tab-taxas tr:hover td{background:none}
+.scroll{overflow:auto}
+.lista{max-height:calc(100vh - 230px)}
+.lista thead th{position:sticky;top:0;background:var(--card);z-index:1}
+.topo{display:flex;gap:12px;align-items:center}
+.acoes{display:flex;gap:6px;justify-content:flex-end}
+.ed{border:1px solid transparent;background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer}
+.ed:hover{color:var(--gold-deep);border-color:var(--line);background:var(--gold-soft)}
+tr.editando td{background:var(--gold-soft)}
+tr.editando input,tr.editando select{padding:6px 8px;font-size:14px;width:100%;min-width:0}
+tr.editando td.dt input{min-width:132px}
+.ok{border:0;background:var(--accent);color:var(--on-accent);border-radius:7px;padding:5px 12px;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
+.ok:hover{background:var(--accent-hover)}
+.ferramentas{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:flex-end;margin-bottom:16px}
+.ferramentas form{display:flex;gap:8px;align-items:flex-end}
+.ferramentas label{margin:0 0 6px}
+.ferramentas input{width:200px}
+.ferramentas .btn{margin:0;width:auto;padding:10px 18px}
+.tab-taxas table{font-size:14.5px}
+.tab-taxas th{vertical-align:bottom}
+.tab-taxas td input{width:72px}
+.cab{display:inline-flex;align-items:center;gap:4px}
+.x{display:inline-grid;place-items:center;width:24px;height:24px;border:0;border-radius:6px;background:none;color:var(--muted);cursor:pointer;padding:0}
+.x svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+.x:hover{background:var(--bad-soft);color:var(--bad)}
+.x[data-ok]{background:var(--bad);color:var(--card)}
+.erro{color:var(--bad);font-size:13px;margin-top:6px;min-height:1em}
+.grid-vendas{display:grid;grid-template-columns:minmax(0,1fr) 392px;gap:20px;align-items:start}
+@media (max-width:1359px){.grid-vendas{grid-template-columns:1fr}.grid-vendas .tab-taxas{max-width:520px}.lista{max-height:none}}
+
+.toast{position:fixed;right:28px;bottom:28px;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:10px;font-size:14px;opacity:0;transform:translateY(12px);transition:opacity .2s,transform .2s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+.empty{color:var(--muted);text-align:center;padding:24px 0}
+/* ---------- entrada (site) ---------- */
+#porta{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:24px;overflow:auto}
+.porta-marca{text-align:center}
+.porta-marca .nome{font:400 46px/1 "Great Vibes",cursive;color:var(--gold-deep)}
+.porta-marca .sub{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+.porta-caixa{width:min(400px,100%);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 28px}
+.porta-caixa h1{font-size:28px;margin:0 0 4px}
+.porta-caixa p{color:var(--muted);margin:0 0 6px;font-size:14.5px}
+.porta-links{display:flex;justify-content:space-between;margin-top:12px}
+body.na-porta aside,body.na-porta main{visibility:hidden}
+.conta{margin:0 18px 14px;padding:12px 12px 8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.conta b{color:var(--ink);letter-spacing:.06em}
+.conta-email{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.conta .ed{margin:6px 0 0 -10px}
+/* ---------- como usar ---------- */
+.topico{padding:20px 0 22px;border-top:1px solid var(--line);max-width:860px}
+.topico:first-child{border-top:0;padding-top:4px}
+.topico-cab{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.topico-cab h2{margin:0}
+.topico ol{margin:10px 0 0;padding-left:22px;line-height:1.6;max-width:72ch}
+.topico li{margin:3px 0}
+.assistir{display:inline-flex;align-items:center;gap:8px}
+.assistir svg{width:12px;height:12px;fill:currentColor}
+#tour{position:fixed;inset:0;z-index:50}
+#tourLuz{position:fixed;border-radius:10px;box-shadow:0 0 0 9999px rgba(28,21,17,.55);outline:2px solid var(--gold);transition:left .55s cubic-bezier(.23,1,.32,1),top .55s cubic-bezier(.23,1,.32,1),width .55s cubic-bezier(.23,1,.32,1),height .55s cubic-bezier(.23,1,.32,1);pointer-events:none}
+#tourCursor{position:fixed;left:0;top:0;width:26px;height:26px;fill:var(--ink);stroke:var(--card);stroke-width:1.6;stroke-linejoin:round;transition:transform .7s cubic-bezier(.23,1,.32,1),opacity .2s;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+#tourBalao{position:fixed;background:var(--card);border-radius:12px;padding:16px 18px 12px;box-shadow:0 12px 40px rgba(20,12,5,.35);transition:left .45s cubic-bezier(.23,1,.32,1),top .45s cubic-bezier(.23,1,.32,1)}
+#tourTitulo{font-size:12.5px;color:var(--muted)}
+#tourTexto{margin:6px 0 12px;font-size:15.5px;line-height:1.5;color:var(--ink)}
+.tour-bt{display:flex;gap:6px;align-items:center}
+.tour-bt span{flex:1}
+.tour-bt button:disabled{opacity:.4;cursor:default}
+@media (prefers-reduced-motion:reduce){#tourLuz,#tourCursor,#tourBalao{transition:none}}
+/* ---------- bandeiras ---------- */
+.bd{display:inline-block;vertical-align:middle;border-radius:4px;box-shadow:0 0 0 1px var(--line);flex:none}
+.bd.p{width:30px;height:19.5px}
+.bd.m{width:36px;height:23.4px}
+.bd-sem{display:inline-block;width:30px;text-align:center;color:var(--muted)}
+.chip.cb{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 6px}
+.chip.cb .bd{box-shadow:none}
+.chip.on .bd{box-shadow:0 0 0 1px var(--on-accent)}
+#fBandBox label,#sBandBox label{margin-top:16px}
+.tab-taxas input[data-b]::placeholder{color:var(--muted);opacity:1;font-style:italic}
+.band-taxas{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:4px 0 8px}
+.band-taxas > span{font-size:13.5px;color:var(--muted)}
+.nota .btn.ghost{margin-left:10px;padding:5px 12px;font-size:13px}
+.tab-taxas td.difere input{border-color:var(--gold);background:var(--gold-soft);font-weight:500}
+.cel-band{display:inline-flex;align-items:center;gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start}
+@media (max-width:1180px){.grid3{grid-template-columns:1fr 1fr}}
+
+/* ---------- gráficos (desenho do Pessoas e Quadro) ---------- */
+.graf-wrap{position:relative}
+.graf{margin-bottom:18px}
+.graf-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:4px}
+.graf-top h2{margin:0}
+.graf-top .per{font-size:13px;color:var(--muted);margin-top:2px}
+.graf .gr{stroke:var(--grid);stroke-width:1}
+.graf .gr.base{stroke:var(--field)}
+.leg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;color:var(--muted)}
+.leg span{display:inline-flex;align-items:center;gap:7px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--s-col)}
+.leg i.ln{height:2px;width:16px;border-radius:1px;background:var(--s-lin)}
+.graf svg{display:block;width:100%;overflow:visible}
+.graf svg text{font:10.5px var(--sans);fill:var(--muted);font-variant-numeric:tabular-nums}
+.graf svg text.vf{font-size:12.5px;font-weight:500;fill:var(--ink)}
+.graf svg text.vp{font-size:12px;fill:var(--muted)}
+.graf svg text.eixo{font-size:11.5px;font-variant-numeric:tabular-nums}
+.graf .hit{fill:transparent;cursor:crosshair}
+.graf svg:focus-visible{outline:2px solid var(--gold);outline-offset:6px;border-radius:6px}
+.graf .cross{stroke:var(--field);stroke-width:1;visibility:hidden}
+.graf .cross.on{visibility:visible}
+.graf .b{transform-box:fill-box;transform-origin:50% 100%;animation:col-sobe 620ms cubic-bezier(.23,1,.32,1) both}
+.graf .nv{animation:aparece 300ms ease-out both}
+.graf .ln{stroke-dasharray:3000;stroke-dashoffset:3000;animation:risca 1100ms cubic-bezier(.77,0,.175,1) 150ms forwards}
+@keyframes col-sobe{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes aparece{from{opacity:0}to{opacity:1}}
+@keyframes risca{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.graf .b,.graf .nv{animation:none}.graf .ln{animation:none;stroke-dashoffset:0}}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:0;border-radius:10px;padding:10px 12px;font-size:13px;box-shadow:0 6px 24px rgba(40,25,10,.14);min-width:200px;opacity:0;transition:opacity .12s;z-index:5}
+.tip.on{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tip b{display:block;font-weight:500;margin-bottom:4px}
+.tip div{display:flex;justify-content:space-between;gap:14px;color:var(--muted)}
+.tip div span:last-child{color:var(--ink);font-variant-numeric:tabular-nums}
+.tip hr{border:0;border-top:1px solid var(--line);margin:6px 0}
+details.tabela{margin-top:12px;font-size:14px}
+details.tabela summary{cursor:pointer;color:var(--gold-deep);font-size:13.5px}
+details.tabela table{margin-top:10px}
+
+@media (max-width:980px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .grid2,.grid-form{grid-template-columns:1fr}
+  main{padding:22px}
+  aside{width:200px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="marca"><div class="nome">Sílvia Novaes</div><div class="sub">Joias &amp; Acessórios</div></div>
+  <nav id="nav" aria-label="Telas">
+    <button data-v="inicio" class="on"><svg viewBox="0 0 24 24"><path d="M4 19V10M10 19V5M16 19v-7M22 19H2"/></svg>Resumo<kbd>F1</kbd></button>
+    <button data-v="lancar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Lançar venda<kbd>F2</kbd></button>
+    <button data-v="simular"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>Qual máquina usar<kbd>F3</kbd></button>
+    <button data-v="vendas"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Vendas<kbd>F4</kbd></button>
+    <button data-v="taxas"><svg viewBox="0 0 24 24"><path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>Taxas<kbd>F5</kbd></button>
+    <button data-v="ajuda"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>Como usar<kbd>F6</kbd></button>
+  </nav>
+  <div class="tema" role="group" aria-label="Tema" id="tema">
+    <button data-t="light" aria-pressed="false">Claro</button><button data-t="dark" aria-pressed="false">Escuro</button><button data-t="auto" aria-pressed="false">Auto</button>
+  </div>
+  <div class="conta" id="conta" hidden>
+    <div class="conta-email" id="contaEmail"></div>
+    <div>Código da loja: <b id="contaCodigo"></b></div>
+    <button class="ed" id="sair">Sair</button>
+  </div>
+  <div class="rodape">Controle de taxas das maquininhas</div>
+</aside>
+
+<main><div class="wrap">
+
+<section class="view on" id="v-inicio">
+  <header><h1>Taxas do cartão</h1><select class="mes" id="mes"></select></header>
+  <div class="kpis" id="kpis"></div>
+  <div class="frase" id="frase"></div>
+  <div class="graf-wrap">
+    <div class="card graf">
+      <div class="graf-top"><div><h2>Mês a mês</h2><div class="per" id="tMes"></div></div>
+        <div class="leg"><span><i class="ln"></i>Taxa média (%)</span><span><i></i>Vendido no cartão (R$)</span></div></div>
+      <svg id="gMes" tabindex="0" role="img" aria-label="Taxa média e vendido no cartão nos últimos 13 meses. Use as setas para andar pelos meses."></svg>
+    </div>
+    <div class="card graf">
+      <div class="graf-top"><div><h2>Dia a dia</h2><div class="per" id="tDia"></div></div>
+        <div class="leg"><span><i class="ln"></i>Taxa do dia (%)</span><span><i></i>Vendido no dia (R$)</span></div></div>
+      <svg id="gDia" tabindex="0" role="img" aria-label="Taxa e vendido em cada dia do mês. Use as setas para andar pelos dias."></svg>
+      <details class="tabela"><summary>Ver em tabela</summary><div class="scroll" id="tabGraf"></div></details>
+    </div>
+    <div class="tip" id="tip" aria-hidden="true"></div>
+    <div class="sr" id="fala" aria-live="polite"></div>
+  </div>
+  <div class="grid3">
+    <div><h2>Por máquina</h2><div class="card" id="porMaquina"></div></div>
+    <div><h2>Por bandeira</h2><div class="card" id="porBandeira"></div></div>
+    <div><h2>Por parcela</h2><div class="card" id="porParcela"></div></div>
+  </div>
+</section>
+
+<section class="view" id="v-lancar">
+  <header><h1>Nova venda</h1></header>
+  <div class="grid-form">
+    <div class="card">
+      <label for="fData">Data</label>
+      <input type="date" id="fData">
+      <label for="fValor">Valor da venda (R$)</label>
+      <input type="text" inputmode="decimal" id="fValor" placeholder="0,00" autocomplete="off">
+      <div class="hint" id="fValorHint" aria-live="polite"></div>
+      <label id="lMaq">Máquina</label>
+      <div class="chips" id="fMaquina" role="group" aria-labelledby="lMaq"></div>
+      <label id="lPar">Parcela</label>
+      <div class="chips" id="fParcela" role="group" aria-labelledby="lPar"></div>
+      <div id="fBandBox"><label id="lBand">Bandeira</label>
+      <div class="chips" id="fBand" role="group" aria-labelledby="lBand"></div></div>
+      <label for="fTaxa">Taxa cobrada (R$)</label>
+      <input type="text" inputmode="decimal" id="fTaxa" placeholder="0,00" autocomplete="off">
+      <div class="hint" id="fHint"></div>
+      <button class="btn" id="fSalvar">Salvar venda</button>
+      <div class="hint" style="text-align:center">Enter também salva</div>
+    </div>
+    <div>
+      <h2>Últimas vendas lançadas</h2>
+      <div class="card scroll" id="recentes"></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-simular">
+  <header><h1>Qual máquina usar?</h1></header>
+  <div class="grid-form">
+    <div class="card">
+      <label for="sValor">Valor da venda (R$)</label>
+      <input type="text" inputmode="decimal" id="sValor" placeholder="0,00" autocomplete="off">
+      <label id="lSPar">Parcela</label>
+      <div class="chips" id="sParcela" role="group" aria-labelledby="lSPar"></div>
+      <div id="sBandBox"><label id="lSBand">Bandeira</label>
+      <div class="chips" id="sBand" role="group" aria-labelledby="lSBand"></div></div>
+    </div>
+    <div>
+      <div class="frase" id="sFrase"></div>
+      <div class="card rank" id="sRank"></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-vendas">
+  <header><h1>Vendas</h1>
+    <div class="topo"><select class="mes" id="mesVendas" aria-label="Mês"></select><button class="btn ghost" id="exportar">Exportar CSV</button></div></header>
+  <div class="card scroll lista" id="lista"></div>
+</section>
+
+<section class="view" id="v-taxas">
+  <header><h1>Taxas das máquinas</h1><button class="btn ghost" id="restaurar">Voltar às taxas de 20/10/2026</button></header>
+  <div class="frase"><p>O programa usa estas taxas para calcular a taxa de cada venda lançada e para comparar as máquinas no simulador.</p><p>Em "Todas as bandeiras" fica a taxa padrão de cada máquina. Se uma bandeira cobrar diferente, escolha a bandeira e preencha só o que muda.</p><p>A tabela tem do PIX ao 12x. Deixe em branco a parcela que a máquina não aceita. As vendas já lançadas não mudam.</p></div>
+  <div class="ferramentas">
+    <form id="formMaq"><div><label for="novaMaq">Nova máquina</label><input id="novaMaq" placeholder="Ex.: Stone" autocomplete="off" maxlength="30"></div><button class="btn">Acrescentar</button></form>
+    <form id="formBand"><div><label for="novaBand">Nova bandeira</label><input id="novaBand" placeholder="Ex.: Cabal" autocomplete="off" maxlength="24"></div><button class="btn">Acrescentar</button></form>
+  </div>
+  <div class="band-taxas"><span id="lTBand">Taxas de</span><div class="chips" id="tBand" role="group" aria-labelledby="lTBand"></div></div>
+  <div class="nota" id="notaBand"></div>
+  <div class="erro" id="erroTaxas" role="alert"></div>
+  <div class="card scroll tab-taxas" id="tabTaxas"></div>
+</section>
+
+<section class="view" id="v-ajuda">
+  <header><h1>Como usar</h1></header>
+  <div class="frase"><p>Cada assunto tem os passos por escrito e uma demonstração na tela. Clique em Assistir: o programa mostra onde clicar e o que digitar, sem salvar nada.</p><p>Na demonstração, as setas do teclado avançam e voltam, a barra de espaço pausa e o Esc fecha.</p></div>
+  <div id="listaAjuda"></div>
+</section>
+
+</div></main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="porta" hidden>
+  <div class="porta-marca"><div class="nome">Sílvia Novaes</div><div class="sub">Joias &amp; Acessórios</div></div>
+  <form class="porta-caixa" id="portaLogin" hidden>
+    <h1 id="loginTit">Entrar</h1>
+    <p>Controle de taxas das maquininhas.</p>
+    <label for="loginEmail">E-mail</label><input type="email" id="loginEmail" autocomplete="username email" required>
+    <label for="loginSenha">Senha</label><input type="password" id="loginSenha" autocomplete="current-password" minlength="6" required>
+    <div class="erro" id="loginErro" role="alert"></div>
+    <button class="btn" id="loginBtn">Entrar</button>
+    <div class="porta-links"><button type="button" class="ed" id="loginAlternar">Criar conta</button><button type="button" class="ed" id="loginEsqueci">Esqueci a senha</button></div>
+  </form>
+  <form class="porta-caixa" id="portaSenha" hidden>
+    <h1>Nova senha</h1>
+    <p>Escolha uma senha nova, com pelo menos 6 caracteres.</p>
+    <label for="novaSenha">Nova senha</label><input type="password" id="novaSenha" autocomplete="new-password" minlength="6" required>
+    <div class="erro" id="senhaErro" role="alert"></div>
+    <button class="btn">Salvar senha</button>
+  </form>
+  <form class="porta-caixa" id="portaLoja" hidden>
+    <h1>Entrar na loja</h1>
+    <p>Digite o código de 8 letras da loja. Quem já usa o programa encontra o código no menu, embaixo, ao lado do e-mail.</p>
+    <label for="lojaCodigo">Código da loja</label><input id="lojaCodigo" autocomplete="off" maxlength="8" required style="text-transform:uppercase;letter-spacing:.12em">
+    <div class="erro" id="lojaErro" role="alert"></div>
+    <button class="btn">Entrar</button>
+    <div class="porta-links"><button type="button" class="ed" id="portaSair">Sair desta conta</button></div>
+  </form>
+</div>
+<div id="tour" hidden>
+  <div id="tourLuz"></div>
+  <svg id="tourCursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8-6 1.6L10 19z"/></svg>
+  <div id="tourBalao" role="dialog" aria-live="polite" aria-labelledby="tourTitulo">
+    <div id="tourTitulo"></div>
+    <p id="tourTexto"></p>
+    <div class="tour-bt"><button id="tourAnt" class="ed">Anterior</button><button id="tourPausa" class="ed">Pausar</button><span></span><button id="tourFechar" class="ed">Fechar</button><button id="tourProx" class="ok">Próximo</button></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="vendor/supabase.min.js"></script>
+<script src="bandeiras.js"></script>
+<script src="app.js"></script>
+<script src="ajuda.js"></script>
+<script src="nuvem.js"></script>
+</body>
+</html>
