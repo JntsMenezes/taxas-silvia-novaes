@@ -161,6 +161,13 @@ tr.editando td.dt input{min-width:132px}
 .toast{position:fixed;right:28px;bottom:28px;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:10px;font-size:14px;opacity:0;transform:translateY(12px);transition:opacity .2s,transform .2s;pointer-events:none}
 .toast.on{opacity:1;transform:none}
 .empty{color:var(--muted);text-align:center;padding:24px 0}
+/* ---------- cobrança por Pix ---------- */
+.cobranca{margin-top:16px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.cob-tit{font:600 18px var(--serif);color:var(--ink)}
+.cob-chave{margin:6px 0 10px;font-size:14px;color:var(--ink);word-break:break-all}
+.cob-bts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.cob-bts .btn.ghost{padding:8px 14px;font-size:14px}
+.cobranca .hint{margin:8px 0 0}
 /* ---------- entrada (site) ---------- */
 #porta{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:24px;overflow:auto}
 .porta-marca{text-align:center}
@@ -325,6 +332,24 @@ details.tabela table{margin-top:10px}
       <label id="lPar">Parcela</label>
       <div class="chips" id="fParcela" role="group" aria-labelledby="lPar"></div>
       <div class="hint" id="fPixHint" aria-live="polite"></div>
+      <div class="cobranca" id="cobranca" hidden>
+        <div class="cob-tit">Cobrar pelo WhatsApp</div>
+        <div id="cobPronta">
+          <p class="cob-chave" id="cobChave"></p>
+          <div class="cob-bts"><button type="button" class="btn ghost" id="cobCopiar">Copiar cobrança</button><button type="button" class="btn ghost" id="cobWhats">Abrir no WhatsApp</button><button type="button" class="ed" id="cobAlterar">Alterar chave</button></div>
+          <p class="hint">A mensagem leva o Pix copia e cola com o valor. Salve a venda quando o Pix cair na conta da loja.</p>
+        </div>
+        <div id="cobForm" hidden>
+          <p class="hint">Cadastre uma vez a chave Pix da loja. Ela fica guardada para todas.</p>
+          <label for="cobTipo">Tipo da chave</label>
+          <select id="cobTipo"><option value="celular">Celular</option><option value="cnpj">CNPJ</option><option value="cpf">CPF</option><option value="email">E-mail</option><option value="aleatoria">Chave aleatória</option></select>
+          <label for="cobValor">Chave Pix</label><input id="cobValor" autocomplete="off">
+          <label for="cobNome">Nome do recebedor (como aparece no banco)</label><input id="cobNome" maxlength="25" autocomplete="off">
+          <label for="cobCidade">Cidade da loja</label><input id="cobCidade" maxlength="15" autocomplete="off">
+          <div class="erro" id="cobErro" role="alert"></div>
+          <div class="cob-bts"><button type="button" class="ok" id="cobSalvar">Salvar chave</button><button type="button" class="ed" id="cobCancelar">Cancelar</button></div>
+        </div>
+      </div>
       <div id="fBandBox"><label id="lBand">Bandeira</label>
       <div class="chips" id="fBand" role="group" aria-labelledby="lBand"></div></div>
       <label for="fTaxa">Taxa cobrada (R$)</label>
@@ -426,6 +451,7 @@ details.tabela table{margin-top:10px}
 <script src="vendor/supabase.min.js"></script>
 <script src="bandeiras.js"></script>
 <script src="app.js"></script>
+<script src="pix.js"></script>
 <script src="ajuda.js"></script>
 <script src="nuvem.js"></script>
 </body>

@@ -36,6 +36,16 @@ const TOURS = {
       { tela: 'lancar', alvo: '#fSalvar', texto: 'Clique em Salvar venda ou aperte Enter. A venda aparece na lista ao lado.' },
     ],
   },
+  cobrar: {
+    titulo: 'Cobrar por Pix pelo WhatsApp',
+    passos: [
+      { tela: 'lancar', alvo: '#fMaquina [data-k="PIX DA LOJA"]', texto: 'Na tela Lançar venda (F2), escolha "Pix da loja": é o Pix que cai direto na conta do banco da loja.', clica: true },
+      { tela: 'lancar', alvo: '#fValor', texto: 'Digite o valor da compra.', digita: '180,00' },
+      { tela: 'lancar', alvo: '#cobranca', texto: 'Na primeira vez, cadastre a chave Pix da loja, o nome do recebedor e a cidade. Fica guardado para todas.' },
+      { tela: 'lancar', alvo: '#cobranca', texto: '"Copiar cobrança" copia uma mensagem pronta, com o Pix copia e cola e o valor já preenchido. "Abrir no WhatsApp" abre a conversa com ela.' },
+      { tela: 'lancar', alvo: '#fSalvar', texto: 'Quando o Pix cair na conta, clique em Salvar venda.' },
+    ],
+  },
   corrigir: {
     titulo: 'Corrigir ou excluir uma venda',
     passos: [
@@ -56,7 +66,7 @@ const TOURS = {
   },
 };
 
-const ORDEM = ['maquina', 'bandeira', 'lancar', 'corrigir', 'simular'];
+const ORDEM = ['maquina', 'bandeira', 'lancar', 'cobrar', 'corrigir', 'simular'];
 
 function renderAjuda() {
   $('listaAjuda').innerHTML = ORDEM.map((k, n) => {

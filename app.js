@@ -437,6 +437,7 @@ function renderParcelasForm() {
   $('fBandBox').hidden = semBandeira(form.p);
   // sem taxa de Pix cadastrada a opção some; explica como liberar
   const semPix = form.m && db.taxas[form.m] && db.taxas[form.m].PIX == null;
+  if (typeof atualizarCobranca === 'function') atualizarCobranca();
   $('fPixHint').textContent = semPix ? `Pix não aparece porque a taxa do PIX da ${nm(form.m)} está em branco em Taxas (F5). Se ela não cobra no Pix, preencha 0.` : '';
 }
 
