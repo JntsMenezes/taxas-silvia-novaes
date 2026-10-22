@@ -41,6 +41,8 @@
   }
 }
 *{box-sizing:border-box}
+/* hidden sempre esconde, mesmo em elemento com display próprio (ex.: #porta é flex) */
+[hidden]{display:none!important}
 ::selection{background:var(--gold-soft);color:var(--ink)}
 input,select{caret-color:var(--gold-deep)}
 *{scrollbar-width:thin;scrollbar-color:var(--field) transparent}

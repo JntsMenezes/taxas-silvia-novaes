@@ -108,13 +108,14 @@ const tour = {
     $('tourPausa').textContent = this.tocando ? 'Pausar' : 'Continuar';
     if (!el) { this.posicionar(null); this.agendar(); return; }
     el.scrollIntoView({ block: 'center', behavior: 'instant' });
-    requestAnimationFrame(() => {
-      this.posicionar(el);
+    // temporizador em vez de requestAnimationFrame: janela coberta por outra não recebe quadros e a demonstração parava
+    setTimeout(() => {
       if (ger !== this.ger) return;
-      if (p.clica) setTimeout(() => { if (ger === this.ger) el.click(); requestAnimationFrame(() => this.posicionar(document.querySelector(p.alvo))); }, 700);
+      this.posicionar(el);
+      if (p.clica) setTimeout(() => { if (ger === this.ger) { el.click(); setTimeout(() => this.posicionar(document.querySelector(p.alvo)), 30); } }, 700);
       if (p.digita && 'value' in el) this.digitar(el, p.digita, ger);
       this.agendar();
-    });
+    }, 30);
   },
   digitar(el, txt, ger) {
     if (!this.guardados.some(([e]) => e === el)) this.guardados.push([el, el.value]);
