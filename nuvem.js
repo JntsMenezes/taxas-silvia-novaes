@@ -113,13 +113,14 @@ const nuvem = (() => {
     }
   }
 
-  const configAtual = () => ({ taxas: db.taxas, taxasBand: db.taxasBand, bandExtra: db.bandExtra, ver: db.ver });
+  const configAtual = () => ({ taxas: db.taxas, taxasBand: db.taxasBand, bandExtra: db.bandExtra, ver: db.ver, pix0: db.pix0 });
   function aplicarConfig(conf) {
     st.base = conf?.taxas ? structuredClone(conf) : null;
     db.taxas = conf?.taxas || structuredClone(TAXAS_OFICIAIS);
     db.taxasBand = conf?.taxasBand || {};
     db.bandExtra = conf?.bandExtra || [];
     db.ver = conf?.ver || TAXAS_VER;
+    db.pix0 = !!conf?.pix0;
     registrarExtras();
   }
 
@@ -137,8 +138,9 @@ const nuvem = (() => {
       const vendas = await todasVendas(loja.id);
       db = { vendas: vendas.map(paraApp) };
       aplicarConfig(loja.config);
-      // loja nova: grava as taxas de partida
-      if (!loja.config?.taxas) enviarConfig();
+      // loja nova grava as taxas de partida; loja antiga recebe o PIX da InfinitePay uma vez
+      const migrou = migrarPix(db);
+      if (!loja.config?.taxas || migrou) enviarConfig();
       gravarCache();
       entrar(true);
       ouvir();

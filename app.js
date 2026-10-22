@@ -28,7 +28,7 @@ const hoje = () => { const d = new Date(); return `${d.getFullYear()}-${String(d
 const TAXAS_VER = 2;
 const TAXAS_OFICIAIS = {
   'MERCADO PAGO': { '1x': 3.10, '2x': 4.70, '3x': 5.55, '4x': 6.40, '5x': 7.25, '6x': 8.10, '10x': 11.50 },
-  'INFINITEPAY': { 'Débito': 1.37, '1x': 3.15, '2x': 5.39, '3x': 6.12, '4x': 6.85, '5x': 7.57, '6x': 8.28, '10x': 11.06 },
+  'INFINITEPAY': { 'PIX': 0, 'Débito': 1.37, '1x': 3.15, '2x': 5.39, '3x': 6.12, '4x': 6.85, '5x': 7.57, '6x': 8.28, '10x': 11.06 },
   'LARANJINHA': { 'Débito': 0.80, '1x': 3.36, '2x': 4.46, '3x': 5.20, '4x': 5.94, '5x': 6.68, '6x': 7.42, '10x': 10.70 },
 };
 
@@ -54,7 +54,17 @@ function carregar() {
   }
   d.taxasBand ??= {};
   d.bandExtra ??= [];
+  migrarPix(d);
   return d;
+}
+
+// 22/10/2026: o PIX da InfinitePay entra como 0% uma única vez (a planilha mostra Pix sem taxa).
+// Se alguém apagar depois, não volta. Devolve true quando mudou algo.
+function migrarPix(d) {
+  if (d.pix0) return false;
+  d.pix0 = true;
+  if (d.taxas?.INFINITEPAY && d.taxas.INFINITEPAY.PIX == null) d.taxas.INFINITEPAY.PIX = 0;
+  return true;
 }
 
 // taxas e bandeiras: no aparelho ou na configuração da loja (site)
@@ -415,6 +425,9 @@ function renderParcelasForm() {
   const ps = parcelasDe(form.m);
   form.p ??= ps.includes('1x') ? '1x' : ps[0];
   chips($('fParcela'), ps, form.p, (p) => { form.p = p; $('fBandBox').hidden = semBandeira(p); sugerirTaxa(); });
+  // sem taxa de Pix cadastrada a opção some; explica como liberar
+  const semPix = form.m && db.taxas[form.m] && db.taxas[form.m].PIX == null;
+  $('fPixHint').textContent = semPix ? `Pix não aparece porque a taxa do PIX da ${nm(form.m)} está em branco em Taxas (F5). Se ela não cobra no Pix, preencha 0.` : '';
 }
 
 function sugerirTaxa() {
