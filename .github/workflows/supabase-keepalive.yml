@@ -1,0 +1,18 @@
+# O Supabase grátis pausa o projeto após 7 dias sem uso. Uma chamada por dia evita isso.
+# A função ping() não lê nenhum dado da loja.
+name: supabase-keepalive
+on:
+  schedule:
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Chamar o Supabase
+        run: |
+          URL=$(grep -o 'https://[a-z0-9]*\.supabase\.co' config.js || true)
+          KEY=$(sed -n 's/.*supabaseKey: *"\([^"]*\)".*/\1/p' config.js)
+          if [ -z "$URL" ]; then echo "config.js ainda sem Supabase; nada a fazer"; exit 0; fi
+          curl -sS -f -X POST "$URL/rest/v1/rpc/ping" -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{}'
